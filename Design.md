@@ -21,7 +21,7 @@ A simple solution to the loan creation application knowing when the batch proces
 to set operational times within it, but it would be preferable for the batch process to communicate it's
 starting to the loan creation application using a message on a queue that the loan creating application polls.
 
-![ Component Diagram](./Overall Architecture.png "Architecture")
+![ Component Diagram](./OverallArchitecture.png "Architecture")
 
 In this way the batch process itself would be a single source of truth as to when it was starting meaning
 that:
