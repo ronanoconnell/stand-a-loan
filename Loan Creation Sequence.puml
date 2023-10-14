@@ -1,0 +1,42 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Sequence of Successfull Loan Creation
+
+autonumber
+actor LoanOriginator
+LoanOriginator -> LoanController: createLoan
+activate LoanController
+LoanController --> LoanService: createLoan
+activate LoanService
+create Customer << Entity >>
+LoanService -> Customer : new
+create Loan << Entity >>
+LoanService -> Loan : new
+loop n (=no. of documents) times
+    LoanService ->> DocumentStorageService: store(document)
+    note right: aim to make this async to improve performance
+    activate DocumentStorageService
+    LoanService --> LoanService: checkForBatchProcessStart()
+    activate LoanService
+    LoanService -> BatchProcessMonitorService: hasBatchProcessStarted()
+    activate BatchProcessMonitorService
+    deactivate BatchProcessMonitorService
+    deactivate LoanService
+    deactivate DocumentStorageService
+end
+LoanService --> LoanService: checkForBatchProcessStart()
+activate LoanService
+LoanService -> BatchProcessMonitorService: hasBatchProcessStarted()
+activate BatchProcessMonitorService
+deactivate BatchProcessMonitorService
+deactivate LoanService
+LoanService -> CustomerRepository: save(customer)
+note right: ORM should cascade save of loan
+activate CustomerRepository
+deactivate CustomerRepository
+LoanController <-- LoanService: True
+deactivate LoanService
+LoanOriginator <- LoanController: HTTP OK
+deactivate LoanController
+@enduml

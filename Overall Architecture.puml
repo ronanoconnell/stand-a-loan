@@ -1,0 +1,30 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+
+node "Client API Infrastructure" {
+HTTP - [API Gateway]
+[API Gateway] - [Client Loan API]
+}
+
+node "Data Storage" {
+    cloud {
+      [Document Storage]
+    }
+    database "Loan Database" {
+    }
+}
+
+[Message Queue]
+[Batch Processor]
+
+
+[Client Loan API] <--> [Loan Database]
+[Client Loan API] <--> [Document Storage]
+[Client Loan API] <-up- [Message Queue]
+[API Gateway] <-up- [Message Queue]
+[Batch Processor] <-right-> [Document Storage]
+[Batch Processor] <--> [Loan Database]
+[Batch Processor] -up-> [Message Queue]
+
+@enduml
