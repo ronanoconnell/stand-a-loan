@@ -1,9 +1,7 @@
 package uk.co.keyoflife.standaloan;
 
 import io.cucumber.spring.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
-import org.springframework.boot.test.web.client.*;
 import org.springframework.http.*;
 import uk.co.keyoflife.standaloan.domain.*;
 import uk.co.keyoflife.standaloan.dto.*;
@@ -15,13 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @CucumberContextConfiguration
 @SpringBootTest(classes = StandALoanApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LoanCreation {
-  @Value(value = "${local.server.port}")
-  protected int port;
-  @Autowired
-  protected TestRestTemplate restTemplate;
+public class LoanCreation extends StandALoanSystemTests {
   private Customer customer;
-  private ResponseEntity<LoanCreateRequest> loanCreateRequestResponseEntity;
+  private ResponseEntity<LoanCreateRequest> latestLoanCreateRequestResponseEntity;
 
   @io.cucumber.java.en.Given("A Customer with first name {string} and surname {string} and date of birth" +
       " {string}")
@@ -42,21 +36,12 @@ public class LoanCreation {
                                                           currentBalance,
                                                           paymentAmount,
                                                           LocalDate.parse(paymentDate), rate);
-    submitNewLoanForCurrentCustomer(loanRequest);
-  }
-
-  private void submitNewLoanForCurrentCustomer(final LoanCreateRequest loanRequest) {
-    loanCreateRequestResponseEntity = restTemplate.postForEntity(buildURI(), loanRequest,
-                                                                 LoanCreateRequest.class);
-  }
-
-  private String buildURI() {
-    return "http://localhost:" + port + "/loans";
+    latestLoanCreateRequestResponseEntity = submitNewLoanForCurrentCustomer(loanRequest);
   }
 
   @io.cucumber.java.en.Then("that customer has {int} loans")
   public void thatCustomerHasLoans(int numberOfLoans) {
     // TODO Make this actually check the loans stored
-    assertEquals(HttpStatus.OK, loanCreateRequestResponseEntity.getStatusCode());
+    assertEquals(HttpStatus.OK, latestLoanCreateRequestResponseEntity.getStatusCode());
   }
 }
