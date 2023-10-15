@@ -3,6 +3,7 @@ package uk.co.keyoflife.standaloan.domain;
 import jakarta.persistence.*;
 
 import java.time.*;
+import java.util.*;
 
 @Entity
 public class Customer {
@@ -12,6 +13,11 @@ public class Customer {
   private String firstName;
   private String surName;
   private LocalDate dateOfBirth;
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Loan> loans = new ArrayList<>();
+
+  public Customer() {
+  }
 
   public Customer(final String firstName, final String surName, final LocalDate dateOfBirth) {
     this.firstName = firstName;
@@ -41,5 +47,17 @@ public class Customer {
 
   public void setDateOfBirth(final LocalDate dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
+  }
+
+  public List<Loan> getLoans() {
+    return loans;
+  }
+
+  public void setLoans(final List<Loan> loans) {
+    this.loans = loans;
+  }
+
+  public void addLoan(final Loan loan) {
+    loans.add(loan);
   }
 }
