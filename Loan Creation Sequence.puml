@@ -1,42 +1,44 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 
-title Sequence of Successfull Loan Creation
+title Sequence of Successful Loan Creation
 
 autonumber
 actor LoanOriginator
-LoanOriginator -> LoanController: createLoan
+LoanOriginator -> LoanController: createLoan(loanRequest)
 activate LoanController
-LoanController --> LoanService: createLoan
-activate LoanService
 create Customer << Entity >>
-LoanService -> Customer : new
+LoanController -> Customer : new
 create Loan << Entity >>
-LoanService -> Loan : new
+LoanController -> Loan : new
+LoanController -> Customer : addLoan(loan)
+LoanController -> Loan : setCustomer(customer)
+LoanController --> CustomerService: createLoan(customer)
+activate CustomerService
 loop n (=no. of documents) times
-    LoanService ->> DocumentStorageService: store(document)
+    CustomerService ->> DocumentStorageService: store(document)
     note right: aim to make this async to improve performance
     activate DocumentStorageService
-    LoanService --> LoanService: checkForBatchProcessStart()
-    activate LoanService
-    LoanService -> BatchProcessMonitorService: hasBatchProcessStarted()
+    CustomerService --> CustomerService: checkForBatchProcessStart()
+    activate CustomerService
+    CustomerService -> BatchProcessMonitorService: hasBatchProcessStarted()
     activate BatchProcessMonitorService
     deactivate BatchProcessMonitorService
-    deactivate LoanService
+    deactivate CustomerService
     deactivate DocumentStorageService
 end
-LoanService --> LoanService: checkForBatchProcessStart()
-activate LoanService
-LoanService -> BatchProcessMonitorService: hasBatchProcessStarted()
+CustomerService --> CustomerService: checkForBatchProcessStart()
+activate CustomerService
+CustomerService -> BatchProcessMonitorService: hasBatchProcessStarted()
 activate BatchProcessMonitorService
 deactivate BatchProcessMonitorService
-deactivate LoanService
-LoanService -> CustomerRepository: save(customer)
+deactivate CustomerService
+CustomerService -> CustomerRepository: save(customer)
 note right: ORM should cascade save of loan
 activate CustomerRepository
 deactivate CustomerRepository
-LoanController <-- LoanService: True
-deactivate LoanService
+LoanController <-- CustomerService: True
+deactivate CustomerService
 LoanOriginator <- LoanController: HTTP OK
 deactivate LoanController
 @enduml

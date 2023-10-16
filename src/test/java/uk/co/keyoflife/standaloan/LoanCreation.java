@@ -50,7 +50,12 @@ public class LoanCreation extends StandALoanSystemTests {
     // TODO Switch to testing through a GET API rather than through the database directly.
     final List<Customer> allCustomers = customerRepository.findAll();
     assertNotEquals(0, allCustomers.size());
+
     // TODO Find the actual customer properly rather than assuming we started with an empty database
-    assertEquals(numberOfLoans, allCustomers.get(0).getLoans().size());
+    final Customer customer1 = allCustomers.get(0);
+    assertEquals("Smith", customer1.getSurName());
+    final List<Loan> loans = customer1.getLoans();
+    assertEquals(numberOfLoans, loans.size());
+    assertEquals(1000.00, loans.get(0).getOpeningBalance());
   }
 }

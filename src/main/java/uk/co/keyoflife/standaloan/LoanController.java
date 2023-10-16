@@ -11,15 +11,15 @@ public class LoanController {
   @Autowired
   CustomerService customerService;
   @PostMapping
-  public void createLoan(LoanCreateRequest request) {
-    Customer customer = new Customer(request.getCustomerFirstName(), request.getCustomerSurName(),
-                                     request.getCustomerDateOfBirth());
+  public void createLoan(@RequestBody LoanCreateRequest loanData) {
+    Customer customer = new Customer(loanData.getCustomerFirstName(), loanData.getCustomerSurName(),
+                                     loanData.getCustomerDateOfBirth());
 
-    final Loan loan = new Loan(request.getOpeningBalance(),
-                               request.getCurrentBalance(),
-                               request.getPaymentAmount(),
-                               request.getPaymentDate(),
-                               request.getRate()
+    final Loan loan = new Loan(loanData.getOpeningBalance(),
+                               loanData.getCurrentBalance(),
+                               loanData.getPaymentAmount(),
+                               loanData.getPaymentDate(),
+                               loanData.getRate()
     );
 
     customer.addLoan(loan);
