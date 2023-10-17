@@ -17,6 +17,8 @@ class CustomerServiceTest {
 
   @Mock
   private DocumentStorageService mockDocumentStorageService;
+  @Mock
+  private BatchProcessMonitorService stubBatchProcessMonitorService;
 
   @InjectMocks
   private CustomerService serviceUnderTest;
@@ -70,4 +72,34 @@ class CustomerServiceTest {
 
     Mockito.verify(mockCustomerRepository, times(0)).save(testCustomer);
   }
+
+  @Test
+  void CustomerLoanNotSavedIfBatchProcessStartsJustBeforeCreation() {
+    Mockito.when(stubBatchProcessMonitorService.hasBatchProcessStarted()).thenReturn(true);
+    Mockito.when(mockDocumentStorageService.store(any())).thenReturn(true);
+    serviceUnderTest.createCustomer(testCustomer, documentList);
+
+    Mockito.verify(mockCustomerRepository, times(0)).save(testCustomer);
+  }
+
+  @Test
+  void CustomerLoanNotSavedIfBatchProcessStartsBetweenDocumentUploads() {
+    Mockito.when(stubBatchProcessMonitorService.hasBatchProcessStarted())
+        .thenReturn(false).thenReturn(true);
+    Mockito.when(mockDocumentStorageService.store(any())).thenReturn(true);
+    serviceUnderTest.createCustomer(testCustomer, documentList);
+
+    Mockito.verify(mockCustomerRepository, times(0)).save(testCustomer);
+  }
+
+  @Test
+  void CustomerLoanNotSavedIfBatchProcessStartsAfterDocumentUploads() {
+    Mockito.when(stubBatchProcessMonitorService.hasBatchProcessStarted())
+        .thenReturn(false).thenReturn(false).thenReturn(false).thenReturn(true);
+    Mockito.when(mockDocumentStorageService.store(any())).thenReturn(true);
+    serviceUnderTest.createCustomer(testCustomer, documentList);
+
+    Mockito.verify(mockCustomerRepository, times(0)).save(testCustomer);
+  }
+
 }

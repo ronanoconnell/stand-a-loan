@@ -14,16 +14,25 @@ public class CustomerService {
   @Autowired
   private DocumentStorageService documentStorage;
 
+  @Autowired
+  private BatchProcessMonitorService batchProcessMonitorService;
+
   void createCustomer(final Customer customer, final List<MultipartFile> documents) {
     int documentsStored = 0;
-    for (MultipartFile document : documents) {
-      if (!documentStorage.store(document))
-        break;
+    if (!checkForBatchProcessStart()) {
+      for (MultipartFile document : documents) {
+        if (!documentStorage.store(document) || checkForBatchProcessStart())
+          break;
 
-      documentsStored++;
+        documentsStored++;
+      }
     }
 
-    if (documentsStored == documents.size())
+    if (documentsStored == documents.size() && !checkForBatchProcessStart())
       customerRepository.save(customer);
+  }
+
+  private Boolean checkForBatchProcessStart() {
+    return batchProcessMonitorService.hasBatchProcessStarted();
   }
 }
