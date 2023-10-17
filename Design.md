@@ -1,5 +1,3 @@
-<span style="color:red;">_TO BE VERIFIED BEFORE PUBLISHING_</span>
-
 ## Design Criteria
 
 - Loan creation must not infringe on overnight the batch process that requires the loan data to be stable
@@ -50,20 +48,38 @@ that:
   - The database update might be put into a transaction created before the file upload but only committed
     after the check at step 8.
 
+## How to Run
+
+From the command line in the root directory of the project run:
+To start the application based on the current state of the code open a terminal in the root directory of the
+project and:
+
+1. Build and run the application:
+
+   ```bash 
+   ./mvnw clean package spring-boot:run
+   ```
+
+This will start the application with a built-in HSQLDB database.
+## To Do
+
+- Link Stored Documents to the correct loan.
+- Convert to a more asynchronous way of storing the documents.
+- Improve the acceptance and integration tests both in coverage and removing hardcoding under the hood.
+
 ## Assumptions
 
-- <span style="color:red;">The possibility of the customer or loan already existing is largely being ignored
+- The possibility of the customer or loan already existing is largely being ignored
   in this solution. The
   data and files of a previous upload may just get overwritten by the next and this will happen silently.
-  </span>
-- <span style="color:red;">API gateway can stop accepting new requests while still sending responses back
-  for those still in flight.</span>
+- API gateway can stop accepting new requests while still sending responses back
+  for those still in flight.
 
 ## Proposed Improvements
 
 - Any uploaded files would still be left orphaned in the document storage if the loan creation did not
   complete fully. These ideally should be deleted now while the system still has knowledge of them.
-- <span style="color:red;">Rather than polling for the batch mode process throughout the day an earlier
+- Rather than polling for the batch mode process throughout the day an earlier
   message could be sent to warn that the batch process will be starting within a given time frame at which
   point the polling would begin. This would hopefully provide a performance improvement during normal
-  operation hours.</span>
+  operation hours.
