@@ -5,7 +5,7 @@ title Sequence of Successful Loan Creation
 
 autonumber
 actor LoanOriginator
-LoanOriginator -> LoanController: createLoan(loanRequest)
+LoanOriginator -> LoanController: createLoan(loanRequest, documents)
 activate LoanController
 create Customer << Entity >>
 LoanController -> Customer : new
@@ -13,7 +13,7 @@ create Loan << Entity >>
 LoanController -> Loan : new
 LoanController -> Customer : addLoan(loan)
 LoanController -> Loan : setCustomer(customer)
-LoanController --> CustomerService: createLoan(customer)
+LoanController --> CustomerService: createLoan(customer, documents)
 activate CustomerService
 loop n (=no. of documents) times
     CustomerService ->> DocumentStorageService: store(document)

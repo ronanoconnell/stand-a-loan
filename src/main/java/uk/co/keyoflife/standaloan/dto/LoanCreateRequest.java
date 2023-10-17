@@ -3,15 +3,15 @@ package uk.co.keyoflife.standaloan.dto;
 import java.time.*;
 
 public class LoanCreateRequest {
-  private final Double openingBalance;
-  private final Double currentBalance;
-  private final Double paymentAmount;
-  private final LocalDate paymentDate;
-  private final Double rate;
   private String customerFirstName;
   private String customerSurName;
   private LocalDate customerDateOfBirth;
 
+  private final Double currentBalance;
+  private final Double paymentAmount;
+  private final LocalDate paymentDate;
+  private final Double rate;
+  private Double openingBalance;
   public LoanCreateRequest(final String customerFirstName, final String customerSurName,
                            final LocalDate customerDateOfBirth, final Double openingBalance,
                            final Double currentBalance, final Double paymentAmount,
@@ -28,6 +28,10 @@ public class LoanCreateRequest {
 
   public Double getOpeningBalance() {
     return openingBalance;
+  }
+
+  public void setOpeningBalance(final Double openingBalance) {
+    this.openingBalance = openingBalance;
   }
 
   public Double getCurrentBalance() {

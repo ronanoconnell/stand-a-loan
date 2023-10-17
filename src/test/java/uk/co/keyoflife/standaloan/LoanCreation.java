@@ -7,11 +7,12 @@ import org.springframework.http.*;
 import uk.co.keyoflife.standaloan.domain.*;
 import uk.co.keyoflife.standaloan.dto.*;
 
+import java.io.*;
+import java.nio.file.*;
 import java.time.*;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @CucumberContextConfiguration
 @SpringBootTest(classes = StandALoanApplication.class,
@@ -20,7 +21,8 @@ public class LoanCreation extends StandALoanSystemTests {
   @Autowired
   private CustomerRepository customerRepository;
   private Customer customer;
-  private ResponseEntity<LoanCreateRequest> latestLoanCreateRequestResponseEntity;
+  private ResponseEntity<String> latestLoanCreateRequestResponseEntity;
+  private final Path uploadPath = Paths.get("uploads");
 
   @io.cucumber.java.en.Given("A Customer with first name {string} and surname {string} and date of birth" +
       " {string}")
@@ -41,6 +43,8 @@ public class LoanCreation extends StandALoanSystemTests {
                                                           currentBalance,
                                                           paymentAmount,
                                                           LocalDate.parse(paymentDate), rate);
+
+
     latestLoanCreateRequestResponseEntity = submitNewLoanForCurrentCustomer(loanRequest);
   }
 
@@ -57,5 +61,21 @@ public class LoanCreation extends StandALoanSystemTests {
     final List<Loan> loans = customer1.getLoans();
     assertEquals(numberOfLoans, loans.size());
     assertEquals(1000.00, loans.get(0).getOpeningBalance());
+
+    final boolean document1Exists = checkDocumentUploadedAndDelete("testfile1.txt");
+    final boolean document2Exists = checkDocumentUploadedAndDelete("testfile2.txt");
+
+    assertTrue(document1Exists && document2Exists);
+  }
+
+  private boolean checkDocumentUploadedAndDelete(final String fileName) {
+    final File documentToCheck = uploadPath.resolve(fileName).toFile();
+
+    if (documentToCheck.exists()) {
+      documentToCheck.delete();
+      return true;
+    }
+
+    return false;
   }
 }
