@@ -1,16 +1,38 @@
 package uk.co.keyoflife.standaloan.dto;
 
+
+import jakarta.validation.constraints.*;
+
 import java.time.*;
 
 public class LoanCreateRequest {
+  @NotNull
+  @NotBlank
   private String customerFirstName;
+
+  @NotNull
+  @NotBlank
+  @NotEmpty
   private String customerSurName;
+  @NotNull
+  @Past
   private LocalDate customerDateOfBirth;
 
+  @NotNull
+  @PositiveOrZero
   private final Double currentBalance;
+  @NotNull
+  @Positive
   private final Double paymentAmount;
+
+  @NotNull
+  @FutureOrPresent(message = "Payment Date Must be in the future")
   private final LocalDate paymentDate;
+  @NotNull
+  @Positive
   private final Double rate;
+  @NotNull
+  @Positive
   private Double openingBalance;
   public LoanCreateRequest(final String customerFirstName, final String customerSurName,
                            final LocalDate customerDateOfBirth, final Double openingBalance,

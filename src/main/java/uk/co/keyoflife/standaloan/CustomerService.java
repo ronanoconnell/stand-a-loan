@@ -17,7 +17,7 @@ public class CustomerService {
   @Autowired
   private BatchProcessMonitorService batchProcessMonitorService;
 
-  void createCustomer(final Customer customer, final List<MultipartFile> documents) {
+  boolean createCustomer(final Customer customer, final List<MultipartFile> documents) {
     int documentsStored = 0;
     if (!checkForBatchProcessStart()) {
       for (MultipartFile document : documents) {
@@ -28,8 +28,12 @@ public class CustomerService {
       }
     }
 
-    if (documentsStored == documents.size() && !checkForBatchProcessStart())
+    if (documentsStored == documents.size() && !checkForBatchProcessStart()) {
       customerRepository.save(customer);
+      return true;
+    }
+
+    return false;
   }
 
   private Boolean checkForBatchProcessStart() {

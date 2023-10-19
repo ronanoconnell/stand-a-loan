@@ -1,9 +1,11 @@
 package uk.co.keyoflife.standaloan;
 
+import jakarta.validation.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.*;
+import org.springframework.web.server.*;
 import uk.co.keyoflife.standaloan.domain.*;
 import uk.co.keyoflife.standaloan.dto.*;
 
@@ -16,7 +18,7 @@ public class LoanController {
   CustomerService customerService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public void createLoan(@RequestPart LoanCreateRequest loanData,
+  public void createLoan(@Valid @RequestPart LoanCreateRequest loanData,
                          @RequestPart("files") MultipartFile[] files) {
     Customer customer = new Customer(loanData.getCustomerFirstName(), loanData.getCustomerSurName(),
                                      loanData.getCustomerDateOfBirth());
@@ -31,6 +33,10 @@ public class LoanController {
     customer.addLoan(loan);
     loan.setCustomer(customer);
 
-    customerService.createCustomer(customer, Arrays.stream(files).toList());
+    if (!customerService.createCustomer(customer, Arrays.stream(files).toList())) {
+      // TODO Don't just assume failure is due to service unavailabilty.
+      throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Loan Creation Currently " +
+          "unavailable. Please try again later");
+    }
   }
 }

@@ -19,7 +19,7 @@ class StandALoanApplicationTests extends StandALoanSystemTests {
   @Test
   void postLoanCreation() {
     final LoanCreateRequest requestToPost = new LoanCreateRequest("Anne",
-                                                                  "Smith, ",
+                                                                  "Smith",
                                                                   LocalDate.parse("2000-01-01"),
                                                                   1000.00, 900.00,
                                                                   100.00,
@@ -27,5 +27,57 @@ class StandALoanApplicationTests extends StandALoanSystemTests {
                                                                   4.50);
 
     assertEquals(HttpStatus.OK, submitNewLoanForCurrentCustomer(requestToPost).getStatusCode());
+  }
+
+  @Test
+  void postLoanRequestWithoutAllRequiredData() {
+    final LoanCreateRequest requestToPost = new LoanCreateRequest("Anne",
+                                                                  "",
+                                                                  LocalDate.parse("2000-01-01"),
+                                                                  1000.00, 900.00,
+                                                                  100.00,
+                                                                  LocalDate.parse("2024-12-12"),
+                                                                  4.50);
+
+    assertEquals(HttpStatus.BAD_REQUEST, submitNewLoanForCurrentCustomer(requestToPost).getStatusCode());
+  }
+
+  @Test
+  void postLoanRequestWithFutureCustomerDateOfBirth() {
+    final LoanCreateRequest requestToPost = new LoanCreateRequest("Anne",
+                                                                  "Smith",
+                                                                  LocalDate.parse("2200-01-01"),
+                                                                  1000.00, 900.00,
+                                                                  100.00,
+                                                                  LocalDate.parse("2024-12-12"),
+                                                                  4.50);
+
+    assertEquals(HttpStatus.BAD_REQUEST, submitNewLoanForCurrentCustomer(requestToPost).getStatusCode());
+  }
+
+  @Test
+  void postLoanRequestWithPastPaymentDate() {
+    final LoanCreateRequest requestToPost = new LoanCreateRequest("Anne",
+                                                                  "Smith",
+                                                                  LocalDate.parse("2000-01-01"),
+                                                                  1000.00, 900.00,
+                                                                  100.00,
+                                                                  LocalDate.parse("2010-12-12"),
+                                                                  4.50);
+
+    assertEquals(HttpStatus.BAD_REQUEST, submitNewLoanForCurrentCustomer(requestToPost).getStatusCode());
+  }
+
+  @Test
+  void postLoanRequestWithZeroOpeningBalance() {
+    final LoanCreateRequest requestToPost = new LoanCreateRequest("Anne",
+                                                                  "Smith",
+                                                                  LocalDate.parse("2000-01-01"),
+                                                                  0.00, 900.00,
+                                                                  100.00,
+                                                                  LocalDate.parse("2034-12-12"),
+                                                                  4.50);
+
+    assertEquals(HttpStatus.BAD_REQUEST, submitNewLoanForCurrentCustomer(requestToPost).getStatusCode());
   }
 }
