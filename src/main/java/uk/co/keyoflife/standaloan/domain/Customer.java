@@ -10,8 +10,12 @@ public class Customer {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
+
+  @Column(nullable = false)
   private String firstName;
+  @Column(nullable = false)
   private String surName;
+  @Column(nullable = false)
   private LocalDate dateOfBirth;
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Loan> loans = new ArrayList<>();

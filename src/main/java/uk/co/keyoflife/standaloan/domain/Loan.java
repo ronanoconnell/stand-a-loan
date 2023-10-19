@@ -10,10 +10,15 @@ public class Loan {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
+  @Column(nullable = false)
   private Double openingBalance;
+  @Column(nullable = false)
   private Double currentBalance;
+  @Column(nullable = false)
   private Double paymentAmount;
+  @Column(nullable = false)
   private LocalDate paymentDate;
+  @Column(nullable = false)
   private Double rate;
   @ManyToOne
   @JoinColumn(name = "customer_id")
