@@ -28,6 +28,10 @@ public class DocumentStorageService {
     final Path destinationPath = uploadPath.resolve(originalFilename);
 
     try {
+      final File destinationFile = destinationPath.toFile();
+      if (destinationFile.exists())
+        destinationFile.delete();
+
       Files.copy(document.getInputStream(), destinationPath);
     } catch (IOException e) {
       return Boolean.FALSE;

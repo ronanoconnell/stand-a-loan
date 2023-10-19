@@ -50,6 +50,10 @@ public class LoanCreation extends StandALoanSystemTests {
 
   @io.cucumber.java.en.Then("that customer has {int} loans")
   public void thatCustomerHasLoans(int numberOfLoans) {
+    // Do first to ensure test documents get deleted whether it passes or fails
+    final boolean document1Exists = checkDocumentUploadedAndDelete("testfile1.txt");
+    final boolean document2Exists = checkDocumentUploadedAndDelete("testfile2.txt");
+
     assertEquals(HttpStatus.OK, latestLoanCreateRequestResponseEntity.getStatusCode());
     // TODO Switch to testing through a GET API rather than through the database directly.
     final List<Customer> allCustomers = customerRepository.findAll();
@@ -61,9 +65,6 @@ public class LoanCreation extends StandALoanSystemTests {
     final List<Loan> loans = customer1.getLoans();
     assertEquals(numberOfLoans, loans.size());
     assertEquals(1000.00, loans.get(0).getOpeningBalance());
-
-    final boolean document1Exists = checkDocumentUploadedAndDelete("testfile1.txt");
-    final boolean document2Exists = checkDocumentUploadedAndDelete("testfile2.txt");
 
     assertTrue(document1Exists && document2Exists);
   }
